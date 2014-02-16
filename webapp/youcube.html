@@ -1,0 +1,201 @@
+<html>
+<head>
+	<title>YouCube - the blog for cube puzzlers</title>
+	
+	<script type="text/javascript">
+		function Blog(body, date, image) {
+			this.body = body;
+			this.date = date;
+			this.image = image;
+
+			Blog.prototype.toString = function() {
+				return ("[" + this.date.shortFormat() + "] " + this.body);
+			};
+
+			Blog.prototype.toHTML = function(highlight) {
+				var blogHTML = "";
+				blogHTML += highlight ? "<p style='background-color:#eeeeee'>" : "<p>";
+
+				if (this.image) {
+					blogHTML += "<strong>" + this.date.shortFormat() + "</strong><br /><table><tr><td><img src='" + this.image + "'/></td><td style='vertical-align:top;'>" + this.body + "</td></tr></table><em>" + this.signature + "</em></p>";
+				}
+				else {
+					blogHTML += "<strong>" + this.date.shortFormat() + "</strong><br />" + this.body + "<br /><em>" + this.signature + "</em></p>";
+				}
+				return blogHTML;
+			};
+
+			Blog.prototype.containsText = function(text) {
+				return (this.body.toLowerCase().indexOf(text.toLowerCase()) != -1);
+			};
+		}
+		Blog.prototype.signature = "Puzzler Ruby";
+		Blog.showSignature = function() {
+			alert("This blog created by " + Blog.prototype.signature + ".");
+		};
+		Blog.blogSorter = function (blog1, blog2) {
+			return blog2.date - blog1.date;
+		};
+		Date.prototype.shortFormat = function() {
+			return ((this.getMonth()+1) + "/" + this.getDate() + "/" + this.getFullYear());
+		};
+
+
+		var blog = 
+			[
+				new Blog("Got the new cube i ordered..", new Date("08/14/2008"), "cube777.png"),
+				new Blog("Sloved the new cube but of course...", new Date("08/19/2008")),
+				new Blog("Managed to get a headache toiling...", new Date("08/16/2008")),
+				new Blog("Found a 7x7x7 cube for sale online....", new Date("08/21/2008"))
+			];
+
+		function showBlog (numEntries) {
+			blog.sort(Blog.blogSorter);
+
+			if (!numEntries)
+				numEntries = blog.length;
+
+			var i = 0;
+			var blogListHTML = "";
+
+			while (i<blog.length && i < numEntries) {
+				blogListHTML += blog[i].toHTML(i%2==0);
+				i++;
+			}
+			document.getElementById("blog").innerHTML = blogListHTML;
+		}
+
+		function searchBlog() {
+			var searchText = document.getElementById("searchtext").value;
+			for (var i=0; i<blog.length; i++) {
+				if (blog[i].containsText(searchText)) {
+					alert(blog[i]);
+					break;
+				}
+			}
+			if (i == blog.length)
+				alert("Sorry, there are no blog entries containing the search text.");
+		}
+
+		function randomBlog() {
+			var i = Math.floor(Math.random() * blog.length);
+			alert(blog[i]);
+		}		
+	</script>
+
+</head>
+
+<body onload="showBlog(3)">
+	<h3>YouCube - The Blog for Cube Puzzlers</h3>
+	<img src = 'cube0.png' alt='YouCube0'>
+	<img src = 'cube1.png' alt='YouCube1'>
+	<img src = 'cube2.png' alt='YouCube2'>
+	<img src = 'cube3.png' alt='YouCube3'>
+	<img src = 'cube4.png' alt='YouCube4'>
+	<img src = 'cube5.png' alt='YouCube5'>
+	<img src = 'cube6.png' alt='YouCube6'>
+	<img src = 'cube7.png' alt='YouCube7'>
+	<img src = 'cube8.png' alt='YouCube8'>
+	<img src = 'cube9.png' alt='YouCube9'>
+	<img src = 'cube10.png' alt='YouCube10'>
+	<img src = 'cube11.png' alt='YouCube11'>
+	<img src = 'cube12.png' alt='YouCube12'>
+	<img src = 'cube13.png' alt='YouCube13'>
+	<img src = 'cube14.png' alt='YouCube14'>
+	<img src = 'cube15.png' alt='YouCube15'>
+	<img src = 'cube16.png' alt='YouCube16'>
+	<img src = 'cube17.png' alt='YouCube17'>
+	<img src = 'cube18.png' alt='YouCube18'>
+	<img src = 'cube19.png' alt='YouCube19'>
+	<img src = 'cube20.png' alt='YouCube20'>
+	<img src = 'cube21.png' alt='YouCube21'>
+	<img src = 'cube22.png' alt='YouCube22'>
+	<img src = 'cube23.png' alt='YouCube23'>
+	<img src = 'cube24.png' alt='YouCube24'>
+	<img src = 'cube25.png' alt='YouCube25'>
+	<img src = 'cube26.png' alt='YouCube26'>
+	<img src = 'cube27.png' alt='YouCube27'>
+	<img src = 'cube28.png' alt='YouCube28'>
+	<img src = 'cube29.png' alt='YouCube29'>
+	<img src = 'cube30.png' alt='YouCube30'>
+	<img src = 'cube31.png' alt='YouCube31'>
+	<img src = 'cube32.png' alt='YouCube32'>
+	<img src = 'cube33.png' alt='YouCube33'>
+	<img src = 'cube34.png' alt='YouCube34'>
+	<img src = 'cube35.png' alt='YouCube35'>
+	<img src = 'cube36.png' alt='YouCube36'>
+	<img src = 'cube37.png' alt='YouCube37'>
+	<img src = 'cube38.png' alt='YouCube38'>
+	<img src = 'cube39.png' alt='YouCube39'>
+	<img src = 'cube40.png' alt='YouCube40'>
+	<img src = 'cube41.png' alt='YouCube41'>
+	<img src = 'cube42.png' alt='YouCube42'>
+	<img src = 'cube43.png' alt='YouCube43'>
+	<img src = 'cube44.png' alt='YouCube44'>
+	<img src = 'cube45.png' alt='YouCube45'>
+	<img src = 'cube46.png' alt='YouCube46'>
+	<img src = 'cube47.png' alt='YouCube47'>
+	<img src = 'cube48.png' alt='YouCube48'>
+	<img src = 'cube49.png' alt='YouCube49'>
+	<img src = 'cube50.png' alt='YouCube50'>
+	<img src = 'cube51.png' alt='YouCube51'>
+	<img src = 'cube52.png' alt='YouCube52'>
+	<img src = 'cube53.png' alt='YouCube53'>
+	<img src = 'cube54.png' alt='YouCube54'>
+	<img src = 'cube55.png' alt='YouCube55'>
+	<img src = 'cube56.png' alt='YouCube56'>
+	<img src = 'cube57.png' alt='YouCube57'>
+	<img src = 'cube58.png' alt='YouCube58'>
+	<img src = 'cube59.png' alt='YouCube59'>
+	<img src = 'cube60.png' alt='YouCube60'>
+	<img src = 'cube61.png' alt='YouCube61'>
+	<img src = 'cube62.png' alt='YouCube62'>
+	<img src = 'cube63.png' alt='YouCube63'>
+	<img src = 'cube64.png' alt='YouCube64'>
+	<img src = 'cube65.png' alt='YouCube65'>
+	<img src = 'cube66.png' alt='YouCube66'>
+	<img src = 'cube67.png' alt='YouCube67'>
+	<img src = 'cube68.png' alt='YouCube68'>
+	<img src = 'cube69.png' alt='YouCube69'>
+	<img src = 'cube70.png' alt='YouCube70'>
+	<img src = 'cube71.png' alt='YouCube71'>
+	<img src = 'cube72.png' alt='YouCube72'>
+	<img src = 'cube73.png' alt='YouCube73'>
+	<img src = 'cube74.png' alt='YouCube74'>
+	<img src = 'cube75.png' alt='YouCube75'>
+	<img src = 'cube76.png' alt='YouCube76'>
+	<img src = 'cube77.png' alt='YouCube77'>
+	<img src = 'cube78.png' alt='YouCube78'>
+	<img src = 'cube79.png' alt='YouCube79'>
+	<img src = 'cube80.png' alt='YouCube80'>
+	<img src = 'cube81.png' alt='YouCube81'>
+	<img src = 'cube82.png' alt='YouCube82'>
+	<img src = 'cube83.png' alt='YouCube83'>
+	<img src = 'cube84.png' alt='YouCube84'>
+	<img src = 'cube85.png' alt='YouCube85'>
+	<img src = 'cube86.png' alt='YouCube86'>
+	<img src = 'cube87.png' alt='YouCube87'>
+	<img src = 'cube88.png' alt='YouCube88'>
+	<img src = 'cube89.png' alt='YouCube89'>
+	<img src = 'cube90.png' alt='YouCube90'>
+	<img src = 'cube91.png' alt='YouCube91'>
+	<img src = 'cube92.png' alt='YouCube92'>
+	<img src = 'cube93.png' alt='YouCube93'>
+	<img src = 'cube94.png' alt='YouCube94'>
+	<img src = 'cube95.png' alt='YouCube95'>
+	<img src = 'cube96.png' alt='YouCube96'>
+	<img src = 'cube97.png' alt='YouCube97'>
+	<img src = 'cube98.png' alt='YouCube98'>
+	<img src = 'cube99.png' alt='YouCube99'>
+	<input type ="text" id="searchtext" name="searchtext" value="" />
+	<input type="button" id="search" value="Search the Blog" onclick="searchBlog();" /><br />
+	<input type="button" id="random" value="random Blog" onclick="randomBlog();" />
+	<div id="blog"></div>
+	<input type="button" id="showall" value="Show All Blog Entries" onclick="showBlog();" />
+</body>
+</html>
+
+
+
+
+
