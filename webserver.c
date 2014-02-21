@@ -9,6 +9,7 @@
 
 #define BUF_SIZE 4096
 #define SMALL_BUF 200
+#define HEADER_MAX 40
 #define SOCKET_CONTINUE 1
 #define SOCKET_DISCONNECT 0
 
@@ -73,9 +74,10 @@ int request_handler(int sock)
 	FILE *clnt_readf = fdopen(dup(sock), "r");
 	int clnt_write;
 	int str_len = 0, line = 0, i;
+	int cont_len = 0;
 	char request[BUF_SIZE];
-	char header[20][SMALL_BUF];
-	char method[10], con_type[15], file_name[30];
+	char header[HEADER_MAX][SMALL_BUF];
+	char method[10], con_type[100], file_name[SMALL_BUF];
 	char contents[BUF_SIZE];
 
 	// GET REQUEST
@@ -91,14 +93,13 @@ int request_handler(int sock)
 		}
 		// END OF HEADER
 		if (strcmp(request, "\r\n") == 0) {
-			fclose(clnt_readf);
 			break;
 		}
 
 		strcpy(header[line], request);
-		// printf("%d, %d, %d, %s", sock, line, str_len, header[line]);
+		printf("%d, %d, %d, %s", sock, line, str_len, header[line]);
 		line++;
-		if (line >= 20)
+		if (line >= HEADER_MAX)
 			break;
 	}
 
@@ -106,7 +107,7 @@ int request_handler(int sock)
 	clnt_write = dup(sock);
 
 	// RESPONSE FOR NON-HTTP REQUEST
-	if (strstr(header[0], "HTTP/") == 0) {
+	if (strstr(header[0], "HTTP/") == NULL) {
 		send_error(clnt_write);
 		close(clnt_write);
 		return SOCKET_CONTINUE;
@@ -124,20 +125,43 @@ int request_handler(int sock)
 
 	// READ FIRST LINE
 	printf("REQUEST: %s", header[0]);
-	strcpy(method, strtok(header[0], " /"));
-	strcpy(file_name, strtok(NULL, " /"));
-	strcpy(con_type, content_type(file_name));
+	strcpy(method, strtok(header[0], " "));
+	strcpy(file_name, strtok(NULL, " "));
+	
 	// FOR INDEX PAGE
-	if (strcmp(file_name, "") == 0)
-		strcpy(file_name, "index.html");
+	if (strcmp(file_name, "/") == 0)
+		strcpy(file_name, "/index.html");
+	if (strstr(file_name, "/webhard") != NULL) {
+		send_dir_page(clnt_write, file_name);
+		return SOCKET_CONTINUE;
+	}
+	strcpy(con_type, content_type(file_name));
 
 	// GET
 	if (strcmp(method, "GET") == 0)
 		send_data(clnt_write, con_type, file_name);
 	// POST
-	if (strcmp(method, "POST") == 0)
-		send_error(clnt_write);
+	if (strcmp(method, "POST") == 0) {
+		// GET THE CONTENT-LENGTH
+		for (i = 0; i < line; i++) {
+			if (strstr(header[i], "Content-Length") != NULL)
+				break;
+		}
+		cont_len = atoi(&header[i][15]);
+		printf("cont len: %d\n", cont_len);
 
+		// READ POST MESSAGE BODY
+		// INCLUDING NULL -> +1
+		memset(request, 0, BUF_SIZE);
+		fgets(request, cont_len + 1, clnt_readf);
+		str_len = strlen(request);
+		printf("post data: %d, %s\n", str_len, request);
+
+		// AFTER READ POST
+		send_data(clnt_write, con_type, file_name);
+	}
+
+	fclose(clnt_readf);
 	close(clnt_write);
 	return SOCKET_CONTINUE;
 }
@@ -146,6 +170,10 @@ char* content_type(char *file)
 {
 	char extension[SMALL_BUF];
 	char file_name[SMALL_BUF];
+
+	if (strstr(file, ".") == NULL) {
+		return "wrong";
+	}
 	strcpy(file_name, file);
 	strtok(file_name, ".");
 	strcpy(extension, strtok(NULL, "."));
