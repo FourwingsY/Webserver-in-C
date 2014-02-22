@@ -1,4 +1,10 @@
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include "send.h"
+#include "constants.h"
 
 void send_data(int clnt_write, char* type, char* file_name)
 {
@@ -124,11 +130,11 @@ void send_dir_page(int clnt_write, char* url_path)
 
 	while ((dir_entry = readdir(dir)) != NULL) {
 		dir_name = dir_entry->d_name;
-		// TO KNOW DIR of FILE
+		// TO KNOW DIR or FILE
 		// stat(dir_entry->d_name, &statbuf);
 
 		// HIDE . .. and hidden files
-		if (strstr(dir_name, ".") != NULL || strstr(dir_name, "/.") != NULL) {
+		if (dir_name[0] == '.' || strstr(dir_name, "/.") != NULL) {
 			printf("hidden dir: %s\n", dir_name);
 			continue;
 		}

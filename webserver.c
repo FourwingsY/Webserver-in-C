@@ -6,16 +6,10 @@
 #include <sys/socket.h>
 #include <pthread.h>
 #include "send.h"
-
-#define BUF_SIZE 4096
-#define SMALL_BUF 200
-#define HEADER_MAX 40
-#define SOCKET_CONTINUE 1
-#define SOCKET_DISCONNECT 0
+#include "request_handler.h"
+#include "constants.h"
 
 void* socket_handler(void *arg);
-int request_handler(int sock);
-char* content_type(char *file);
 void error_handling(char *msg);
 
 int main(int argc, const char* argv[])
@@ -68,127 +62,6 @@ void* socket_handler(void *arg)
 	close(sock);
 	return NULL;
 
-}
-int request_handler(int sock)
-{
-	FILE *clnt_readf = fdopen(dup(sock), "r");
-	int clnt_write;
-	int str_len = 0, line = 0, i;
-	int cont_len = 0;
-	char request[BUF_SIZE];
-	char header[HEADER_MAX][SMALL_BUF];
-	char method[10], con_type[100], file_name[SMALL_BUF];
-	char contents[BUF_SIZE];
-
-	// GET REQUEST
-	memset(request, 0, BUF_SIZE);
-	while (1) {
-		fgets(request, BUF_SIZE, clnt_readf);
-		str_len = strlen(request);
-
-		// CLIENT CLOSED SOCKET OR READ ERROR
-		if (str_len == 0) {
-			fclose(clnt_readf);
-			return SOCKET_DISCONNECT;
-		}
-		// END OF HEADER
-		if (strcmp(request, "\r\n") == 0) {
-			break;
-		}
-
-		strcpy(header[line], request);
-		printf("%d, %d, %d, %s", sock, line, str_len, header[line]);
-		line++;
-		if (line >= HEADER_MAX)
-			break;
-	}
-
-	// MAKE RESPONSE
-	clnt_write = dup(sock);
-
-	// RESPONSE FOR NON-HTTP REQUEST
-	if (strstr(header[0], "HTTP/") == NULL) {
-		send_error(clnt_write);
-		close(clnt_write);
-		return SOCKET_CONTINUE;
-	}
-
-	// IS THIS CLOSE SIGNAL?
-	for (i = 0; i < line; i++) {
-		if (strstr(header[i], "Connection") != NULL)
-			if (strstr(header[i], "close") != NULL) {
-				printf("CLOSE signal from %d\n", sock);
-				close(clnt_write);
-				return SOCKET_DISCONNECT;
-			}
-	}
-
-	// READ FIRST LINE
-	printf("REQUEST: %s", header[0]);
-	strcpy(method, strtok(header[0], " "));
-	strcpy(file_name, strtok(NULL, " "));
-	
-	// FOR INDEX PAGE
-	if (strcmp(file_name, "/") == 0)
-		strcpy(file_name, "/index.html");
-	if (strstr(file_name, "/webhard") != NULL) {
-		send_dir_page(clnt_write, file_name);
-		return SOCKET_CONTINUE;
-	}
-	strcpy(con_type, content_type(file_name));
-
-	// GET
-	if (strcmp(method, "GET") == 0)
-		send_data(clnt_write, con_type, file_name);
-	// POST
-	if (strcmp(method, "POST") == 0) {
-		// GET THE CONTENT-LENGTH
-		for (i = 0; i < line; i++) {
-			if (strstr(header[i], "Content-Length") != NULL)
-				break;
-		}
-		cont_len = atoi(&header[i][15]);
-		printf("cont len: %d\n", cont_len);
-
-		// READ POST MESSAGE BODY
-		// INCLUDING NULL -> +1
-		memset(request, 0, BUF_SIZE);
-		fgets(request, cont_len + 1, clnt_readf);
-		str_len = strlen(request);
-		printf("post data: %d, %s\n", str_len, request);
-
-		// AFTER READ POST
-		send_data(clnt_write, con_type, file_name);
-	}
-
-	fclose(clnt_readf);
-	close(clnt_write);
-	return SOCKET_CONTINUE;
-}
-
-char* content_type(char *file)
-{
-	char extension[SMALL_BUF];
-	char file_name[SMALL_BUF];
-
-	if (strstr(file, ".") == NULL) {
-		return "wrong";
-	}
-	strcpy(file_name, file);
-	strtok(file_name, ".");
-	strcpy(extension, strtok(NULL, "."));
-
-	if (strcmp(extension, "html") == 0 || strcmp(extension, "htm") == 0)
-		return "text/html";
-	if (strcmp(extension, "css") == 0)
-		return "text/css";
-	if (strcmp(extension, "js") == 0)
-		return "application/x-javascript";
-	if (strcmp(extension, "ico") == 0)
-		return "image/x-icon";
-	if (strcmp(extension, "png") == 0)
-		return "image/png";
-	return "text/plain";
 }
 
 void error_handling(char *message)

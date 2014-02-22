@@ -1,12 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include "url_encode.h"
-
-#define BUF_SIZE 4096
-#define SMALL_BUF 200
 #define WEBAPP_DIR "webapp"
 
 void send_data(int clnt_write, char* type, char* file_name);
